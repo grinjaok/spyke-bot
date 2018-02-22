@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start" : "node app.js"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "botbuilder": "^3.14.0",
     "replaceall": "^0.1.6",
     "request": "^2.83.0",
-    "restify": "^6.3.4"
+    "restify": "^6.3.4",
+    "strftime": "^0.10.0"
   }
 }
