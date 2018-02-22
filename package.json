@@ -1,0 +1,18 @@
+{
+  "name": "skype-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "botbuilder": "^3.14.0",
+    "replaceall": "^0.1.6",
+    "request": "^2.83.0",
+    "restify": "^6.3.4"
+  }
+}
