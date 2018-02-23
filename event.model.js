@@ -15,9 +15,9 @@ const NotificationModel = new Schema({
     type: String,
     required: 'no description'
   },
-  Session: {
+  Address: {
     type: String,
-    required: 'no session'
+    required: 'no address'
   },
   UserCreated: {
     type: String,

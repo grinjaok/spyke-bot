@@ -1,7 +1,8 @@
+const EventEmitter = require('events')
 const eventModel = require('./event.model')
 const eventService = require('./service')
 const fiveMinutes = 1000 * 60 * 5
-
+const eventEmitter = new EventEmitter()
 class EventPlaner {
 
   constructor() {
@@ -17,6 +18,10 @@ class EventPlaner {
     }
   }
 
+  getEventEmitter() {
+    return eventEmitter
+  }
+
   async comingEvents() {
     try {
       const ongoingEvents = await eventService.returnFindEvent({ IsEnded: false })
@@ -24,6 +29,7 @@ class EventPlaner {
         const timeToInvoke = this.timeCalculation(event)
         if (timeToInvoke > 0 && timeToInvoke < fiveMinutes) {
           console.log(event) // need to start bot dialog and feed him parsed session
+          eventEmitter.emit('sendNotification', event)
           eventService.returnUpdateEvent({ _id: event.id }, { $set: { IsEnded: true } } )
         }
 
@@ -40,7 +46,7 @@ class EventPlaner {
     try {
       const parsedMessage = JSON.parse(session.message.text.split('|')[1])
       const event = new eventModel(parsedMessage)
-      event.Session = JSON.stringify(session)
+      event.Address = JSON.stringify(session.message.address)
       event.UserCreated = 'newUser' //take from session user name
       return event
     } catch (error) {
