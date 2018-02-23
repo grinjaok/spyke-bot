@@ -21,7 +21,7 @@ class Timer {
       if (timeToInvoke > 0) {
         console.log(event) // need to start bot dialog and feed him parsed session
       } else {
-        eventService.returnUpdateEvent(event.id, {$set:{IsEnded:true}},)
+        eventService.returnUpdateEvent({_id: event.id}, {$set:{IsEnded:true}},)
       }
     })
   }
@@ -44,7 +44,7 @@ class Timer {
   setTimer(event, session, timeToInvoke) {
     setTimeout(() => {
       session.send(event.Description)
-      eventService.returnUpdateEvent(event.id, {$set:{IsEnded:true}},)
+      eventService.returnUpdateEvent({_id: event.id}, {$set:{IsEnded:true}},)
     }, timeToInvoke)
   }
 }
