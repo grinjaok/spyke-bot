@@ -13,6 +13,10 @@ class EventPlaner {
     try {
       const event = this.modelBind(session)
       eventService.returnCreateEvent(event)
+      const calcCheck = this.timeCalculation(event)
+      if (!calcCheck) {
+        session.send('Can not convert enter date')
+      }
     } catch (error) {
       session.send('Some error in message format, please recheck it and try again')
     }
@@ -28,7 +32,6 @@ class EventPlaner {
       ongoingEvents.forEach(event => {
         const timeToInvoke = this.timeCalculation(event)
         if (timeToInvoke > 0 && timeToInvoke < fiveMinutes) {
-          console.log(event) // need to start bot dialog and feed him parsed session
           eventEmitter.emit('sendNotification', event)
           eventService.returnUpdateEvent({ _id: event.id }, { $set: { IsEnded: true } } )
         }
@@ -47,7 +50,7 @@ class EventPlaner {
       const parsedMessage = JSON.parse(session.message.text.split('|')[1])
       const event = new eventModel(parsedMessage)
       event.Address = JSON.stringify(session.message.address)
-      event.UserCreated = 'newUser' //take from session user name
+      event.UserCreated = session.message.user.name
       return event
     } catch (error) {
       session.send('Can not parse you message')
@@ -67,7 +70,7 @@ class EventPlaner {
       const timeNow = new Date()
       return timeWhenInvoke - Date.now()
     } catch (error) {
-      //log error
+      return null
     }
   }
 }
