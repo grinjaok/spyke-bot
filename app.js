@@ -20,6 +20,8 @@ const bot = new builder.UniversalBot(connector)
 
 server.post('/api/messages', connector.listen())
 
+timer.serverAwake()
+
 bot.dialog('/', (session) => {
   if (session.message.text.includes('#EVENTPLANNING')) {
     timer.start(session)

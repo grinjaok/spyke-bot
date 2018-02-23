@@ -19,12 +19,13 @@ const NotificationModel = new Schema({
     type: String,
     required: 'no session'
   },
-  Status: {
-    type: [{
-      type: String,
-      enum: ['ongoing', 'completed']
-    }],
-    default: ['ongoing']
+  UserCreated: {
+    type: String,
+    required: 'no user'
+  },
+  IsEnded: {
+    type: Boolean,
+    default: false
   },
   DateCreated: {
     type: Date,

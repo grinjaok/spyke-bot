@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Events =  require('./notification.model')
+const Events =  require('./event.model')
 
 class EventsService {
   async returnFindEvent (params = {}) {
