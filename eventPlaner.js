@@ -3,6 +3,11 @@ const eventService = require('./service')
 const fiveMinutes = 1000 * 60 * 5
 
 class EventPlaner {
+
+  constructor() {
+    this.comingEvents = this.comingEvents.bind(this)
+  }
+
   start(session) {
     try {
       const event = this.modelBind(session)
@@ -21,13 +26,13 @@ class EventPlaner {
           console.log(event) // need to start bot dialog and feed him parsed session
           eventService.returnUpdateEvent({ _id: event.id }, { $set: { IsEnded: true } } )
         }
+
         if (timeToInvoke < 0) {
           eventService.returnUpdateEvent({ _id: event.id }, { $set: { IsEnded: true } } )
         }
       })
     } catch (error) {
       //log error
-      console.log(error)
     }
   }
 

@@ -23,7 +23,7 @@ const bot = new builder.UniversalBot(connector)
 
 server.post('/api/messages', connector.listen())
 
-setInterval(eventPlaner.comingEvents, 5000)
+setInterval(eventPlaner.comingEvents, twoMinutes)
 
 bot.dialog('/', (session) => {
   if (session.message.text.includes('#EVENTPLANNING')) {
