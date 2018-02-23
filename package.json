@@ -14,6 +14,7 @@
     "mongoose": "^5.0.6",
     "replaceall": "^0.1.6",
     "request": "^2.83.0",
-    "restify": "^6.3.4"
+    "restify": "^6.3.4",
+    "strftime": "^0.10.0"
   }
 }
