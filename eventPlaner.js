@@ -2,10 +2,10 @@ const EventEmitter = require('events')
 const eventModel = require('./event.model')
 const eventService = require('./service')
 const fiveMinutes = 1000 * 60 * 5
-const eventEmitter = new EventEmitter()
-class EventPlaner {
+class EventPlaner extends EventEmitter {
 
   constructor() {
+    super()
     this.comingEvents = this.comingEvents.bind(this)
   }
 
@@ -13,31 +13,24 @@ class EventPlaner {
     try {
       const event = this.modelBind(session)
       eventService.returnCreateEvent(event)
-      const calcCheck = this.timeCalculation(event)
-      if (!calcCheck) {
-        session.send('Can not convert enter date')
-      }
     } catch (error) {
       session.send('Some error in message format, please recheck it and try again')
     }
   }
 
-  getEventEmitter() {
-    return eventEmitter
-  }
 
   async comingEvents() {
     try {
-      const ongoingEvents = await eventService.returnFindEvent({ IsEnded: false })
+      const ongoingEvents = await eventService.returnFindEvent({ isEnded: false })
       ongoingEvents.forEach(event => {
         const timeToInvoke = this.timeCalculation(event)
         if (timeToInvoke > 0 && timeToInvoke < fiveMinutes) {
-          eventEmitter.emit('sendNotification', event)
-          eventService.returnUpdateEvent({ _id: event.id }, { $set: { IsEnded: true } } )
+          this.emit('sendNotification', event)
+          eventService.returnUpdateEvent({ _id: event.id }, { $set: { isEnded: true } } )
         }
 
         if (timeToInvoke < 0) {
-          eventService.returnUpdateEvent({ _id: event.id }, { $set: { IsEnded: true } } )
+          eventService.returnUpdateEvent({ _id: event.id }, { $set: { isEnded: true } } )
         }
       })
     } catch (error) {
@@ -47,10 +40,9 @@ class EventPlaner {
 
   modelBind(session) {
     try {
-      const parsedMessage = JSON.parse(session.message.text.split('|')[1])
-      const event = new eventModel(parsedMessage)
-      event.Address = JSON.stringify(session.message.address)
-      event.UserCreated = session.message.user.name
+      const event = new eventModel(session.dialogData)
+      event.address = JSON.stringify(session.message.address)
+      event.userCreated = session.message.user.name
       return event
     } catch (error) {
       session.send('Can not parse you message')
@@ -59,18 +51,11 @@ class EventPlaner {
 
   timeCalculation (event) {
     try {
-      const splitDate = event.Date.split('-')
-      const splitTime = event.Time.split('-')
-      const year = splitDate[2]
-      const month = +splitDate[0] - 1
-      const day = splitDate[1]
-      const hours = splitTime[0]
-      const minutes = splitTime[1]
-      const timeWhenInvoke = new Date(year, month, day, hours, minutes)
+      const timeWhenInvoke = new Date(event.eventDate)
       const timeNow = new Date()
       return timeWhenInvoke - Date.now()
     } catch (error) {
-      return null
+      //log error
     }
   }
 }

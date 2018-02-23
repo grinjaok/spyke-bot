@@ -3,31 +3,31 @@ const Schema = mongoose.Schema
 
 
 const NotificationModel = new Schema({
-  Time: {
-    type: String,
-    required: 'no time'
-  },
-  Date: {
+  eventDate: {
     type: String,
     required: 'no date'
   },
-  Description: {
+  eventPlace: {
+    type: String,
+    required: 'no place'
+  },
+  eventDescription: {
     type: String,
     required: 'no description'
   },
-  Address: {
+  address: {
     type: String,
     required: 'no address'
   },
-  UserCreated: {
+  userCreated: {
     type: String,
     required: 'no user'
   },
-  IsEnded: {
+  isEnded: {
     type: Boolean,
     default: false
   },
-  DateCreated: {
+  dateCreated: {
     type: Date,
     default: Date.now
   },

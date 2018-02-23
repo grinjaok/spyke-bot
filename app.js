@@ -22,27 +22,42 @@ const connector = new builder.ChatConnector({
 
 const bot = new builder.UniversalBot(connector)
 
-const eventEmitter = eventPlaner.getEventEmitter()
-
 server.post('/api/messages', connector.listen())
 
 setInterval(eventPlaner.comingEvents, 5000)
 
-bot.dialog('/', (session, event) => {
-  if (session.message.text.includes('#EVENTPLANNING')) {
-    eventPlaner.start(session)
-  }
 
-  if (event) {
-    session.send(`Event planned on ${event.Time} ${event.Description}`)
+bot.dialog('eventPlanning', [
+  function (session) {
+      session.send("Welcome to event planning");
+      builder.Prompts.time(session, "Please provide a event date and time (e.g.: June 6th at 5pm)");
+  },
+  function (session, results) {
+      session.dialogData.eventDate = builder.EntityRecognizer.resolveTime([results.response]);
+      builder.Prompts.text(session, "Where is it should be?");
+  },
+  function (session, results) {
+      session.dialogData.eventPlace = results.response;
+      builder.Prompts.text(session, "Enter event description");
+  },
+  function (session, results) {
+      session.dialogData.eventDescription = results.response;
+      session.send(`Event confirmed. Event details: <br/>Date/Time: ${session.dialogData.eventDate} <br/>Place: ${session.dialogData.eventPlace} <br/>Description: ${session.dialogData.eventDescription}`);
+      eventPlaner.start(session)
+      session.endDialog();
   }
+])
+.triggerAction({
+  matches: /^#EVENTPLANNING$/i,
 });
 
-eventEmitter.on('sendNotification', (event) => {
-  const address = JSON.parse(event.Address)
-  bot.beginDialog(address, '/', event)
+eventPlaner.on('sendNotification', (event) => {
+  const address = JSON.parse(event.address)
+  bot.beginDialog(address, 'sendNotification', event)
 })
 
-// bot.dialog('/sendNotification', (session, event) => {
-//   session.send(`Event planned on ${event.Time} ${event.Description}` )
-// })
+bot.dialog('sendNotification', (session, event) => {
+  // session.send(`Event details: <br/>Date/Time: ${event.eventDate} <br/>Place: ${event.eventPlace} <br/>Description: ${event.eventDescription}`)
+  session.endDialog(`Event details: <br/>Date/Time: ${event.eventDate} <br/>Place: ${event.eventPlace} <br/>Description: ${event.eventDescription}`)
+});
+
