@@ -1,43 +1,43 @@
-
+'use strict'
 const restify = require('restify')
 const builder = require('botbuilder')
 const eventPlaner = require('./eventPlaner')
 const mongoose = require('mongoose')
-const util = require('util')
 const strftime = require('strftime')
-const strftimeUTC3 = strftime.timezone(120)
+const sixtyMinutes = 60
+require('dotenv').config()
 
-const server = restify.createServer()
 const twoMinutes = 2 * 60 * 1000
 
 mongoose.Promise = global.Promise
-mongoose.connect('mongodb://localhost/skype-bot')
+mongoose.connect(process.env.COSMOSDB_CONNSTR, {
+  auth: {
+    user: process.env.COSMODB_USER,
+    password: process.env.COSMODB_PASSWORD,
+  }
+})
 
-server.listen(process.env.port || process.env.PORT || 3978, () => {
-  console.log('%s listening to %s', server.name, server.url)
+const server = restify.createServer();
+server.listen(process.env.port || process.env.PORT || 3978, function () {
+   console.log('%s listening to %s', server.name, server.url); 
 });
-
+  
 const connector = new builder.ChatConnector({
-  appId: process.env.MICROSOFT_APP_ID,
-  appPassword: process.env.MICROSOFT_APP_PASSWORD
+  appId: process.env.MicrosoftAppId,
+  appPassword: process.env.MicrosoftAppPassword,
+  openIdMetadata: process.env.BotOpenIdMetadata 
 });
+
+server.post('/api/messages', connector.listen());
 
 const bot = new builder.UniversalBot(connector)
 
-// const eventInfo = (date, place, description) => {
-//   const convertedDate = strftimeUTC3('%F %T', new Date(date))
-//   return `Event details: <br/>Date/Time: ${convertedDate} <br/>Place: ${place} <br/>Description: ${description}`
-// }
-
-server.post('/api/messages', connector.listen())
-
-setInterval(eventPlaner.comingEvents, 5000)
-
+setInterval(eventPlaner.comingEvents, twoMinutes)
 
 bot.dialog('eventPlanning', [  
   (session) => {
       session.send("Welcome to event planning");
-      builder.Prompts.time(session, "Please provide a event date and time (e.g.: June 6th at 5pm)");
+      builder.Prompts.time(session, "Please provide a event date and time (e.g.: June 6th 11:30)");
   },
   (session, results) => {
       session.dialogData.eventDate = builder.EntityRecognizer.resolveTime([results.response]);
@@ -49,7 +49,7 @@ bot.dialog('eventPlanning', [
   },
   (session, results) => {
       session.dialogData.eventDescription = results.response;
-      const convertedDate = strftimeUTC3('%F %T', new Date(session.dialogData.eventDate))
+      const convertedDate = strftime('%F %T', new Date(session.dialogData.eventDate))
       const eventInfo = `Event details: <br/>Date/Time: ${convertedDate} <br/>Place: ${session.dialogData.eventPlace} <br/>Description: ${session.dialogData.eventDescription}`
       session.send(`Event confirmed. ${eventInfo}`);
       eventPlaner.start(session)
@@ -57,7 +57,7 @@ bot.dialog('eventPlanning', [
   }
 ])
 .triggerAction({
-  matches: /^#EVENTPLANNING$/i,
+  matches: /^#EP/i,
 });
 
 eventPlaner.on('sendNotification', (event) => {
@@ -65,11 +65,14 @@ eventPlaner.on('sendNotification', (event) => {
   bot.beginDialog(address, 'sendNotification', event)
 })
 
+bot.dialog('/', (session) => {  
+})
+
 bot.dialog('sendNotification', (session, event) => {
-  const convertedDate = strftimeUTC3('%F %T', new Date(event.eventDate))
-  const eventInfo = `Event details: <br/>Date/Time: ${convertedDate} <br/>Place: ${event.eventPlace} <br/>Description: ${event.eventDescription}`  
+  const eventDate = new Date(event.eventDate)
+  eventDate.setHours(eventDate.getHours() + event.userTimeOffset / sixtyMinutes)
+  const convertedDate = strftime('%F %T', eventDate)
+  const eventInfo = `(*) Event details: <br/>Date/Time: ${convertedDate} <br/>Place: ${event.eventPlace} <br/>Description: ${event.eventDescription}`  
   session.endDialog(eventInfo)
 });
-
-
 

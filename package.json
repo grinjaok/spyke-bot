@@ -1,20 +1,24 @@
 {
-  "name": "skype-bot",
+  "name": "formbot",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "azure-publish": "node publish.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "botbuilder": "^3.14.0",
+    "dotenv": "^5.0.1",
+    "moment": "^2.20.1",
     "mongoose": "^5.0.6",
-    "replaceall": "^0.1.6",
-    "request": "^2.83.0",
     "restify": "^6.3.4",
     "strftime": "^0.10.0"
+  },
+  "devDependencies": {
+    "request": "^2.83.0",
+    "zip-folder": "^1.0.0"
   }
 }

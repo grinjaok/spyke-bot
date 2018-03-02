@@ -1,3 +1,4 @@
+'use strict'
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
@@ -31,6 +32,10 @@ const NotificationModel = new Schema({
     type: Date,
     default: Date.now
   },
+  userTimeOffset: {
+    type: Number,
+    required: 'no time offset'
+  }
 })
 
 module.exports = mongoose.model('Events', NotificationModel);
