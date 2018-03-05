@@ -10,15 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "botbuilder": "^3.14.0",
-    "dotenv": "^5.0.1",
-    "moment": "^2.20.1",
-    "mongoose": "^5.0.6",
-    "restify": "^6.3.4",
+    "botbuilder": "3.14.0",
+    "dotenv": "5.0.1",
+    "moment": "2.20.1",
+    "mongoose": "5.0.6",
+    "restify": "6.3.4",
     "strftime": "^0.10.0"
   },
   "devDependencies": {
-    "request": "^2.83.0",
-    "zip-folder": "^1.0.0"
+    "request": "2.83.0",
+    "zip-folder": "1.0.0"
   }
 }

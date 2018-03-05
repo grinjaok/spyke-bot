@@ -34,7 +34,7 @@ const NotificationModel = new Schema({
   },
   userTimeOffset: {
     type: Number,
-    required: 'no time offset'
+    default: 0
   }
 })
 

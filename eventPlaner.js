@@ -1,10 +1,9 @@
 'use strict'
 const EventEmitter = require('events')
 const eventModel = require('./event.model')
-const eventService = require('./service')
+const eventService = require('./eventService')
 const moment = require('moment')
 const fiveMinutes = 1000 * 60 * 5
-const sixtyMinutes = 60
 class EventPlaner extends EventEmitter {
 
   constructor() {
@@ -46,10 +45,9 @@ class EventPlaner extends EventEmitter {
       const event = new eventModel(session.dialogData)
       event.address = JSON.stringify(session.message.address)
       event.userCreated = session.message.user.name
-      const userLocalTimezone = moment(session.message.localTimestamp)._tzm
+      event.userTimeOffset = session.dialogData.timeOffset
       const newTime = new Date(event.eventDate)
-      newTime.setHours(newTime.getHours() - userLocalTimezone / sixtyMinutes)
-      event.userTimeOffset = userLocalTimezone
+      newTime.setHours(newTime.getHours() - event.userTimeOffset)
       event.eventDate = newTime.toString()
       return event
     } catch (error) {
