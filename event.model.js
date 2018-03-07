@@ -22,7 +22,7 @@ const NotificationModel = new Schema({
   },
   userCreated: {
     type: String,
-    required: 'no user'
+    default: 'no user'
   },
   isEnded: {
     type: Boolean,

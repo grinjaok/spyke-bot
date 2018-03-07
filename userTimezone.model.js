@@ -6,11 +6,11 @@ const Schema = mongoose.Schema
 const UserTimezoneModel = new Schema({
   userName: {
     type: String,
-    required: 'no user name'
+    default: 'no user name'
   },
   userId: {
     type: String,
-    required: 'no id'
+    default: 'no id'
   },
   timeOffset: {
     type: Number,

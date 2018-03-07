@@ -4,6 +4,7 @@ const eventModel = require('./event.model')
 const eventService = require('./eventService')
 const moment = require('moment')
 const fiveMinutes = 1000 * 60 * 5
+const halfAnHour = 1000 * 60 * 30
 class EventPlaner extends EventEmitter {
 
   constructor() {
@@ -63,6 +64,40 @@ class EventPlaner extends EventEmitter {
     } catch (error) {
       //log error
     }
+  }
+
+  convertSelectedDateToEventDate(session) {
+    const dateNow = new Date()
+    const year = dateNow.getFullYear()
+    const month = dateNow.getMonth()
+    const day = dateNow.getDate() + session.dialogData.eventDayOffset
+    const hours = +session.dialogData.eventTime.split(':')[0]
+    const minutes = +session.dialogData.eventTime.split(':')[1]
+    const seconds = 0
+    return new Date(year, month, day, hours, minutes, seconds)
+  }
+
+  getCloseTime(session) {
+    const timeArray = []
+    const dateNow = new Date()
+    dateNow.setHours(dateNow.getHours() + session.dialogData.timeOffset)
+    if (dateNow.getMinutes() < 30) {
+      timeArray.push(new Date(dateNow.setMinutes(30)))
+      timeArray.push(this.addMinutes(dateNow, 30))
+      timeArray.push(this.addMinutes(dateNow, 60))
+      timeArray.push(this.addMinutes(dateNow, 90))
+    } else {
+      dateNow.setMinutes(0)
+      timeArray.push(new Date(dateNow.setHours(dateNow.getHours() + 1)))
+      timeArray.push(this.addMinutes(dateNow, 30))
+      timeArray.push(this.addMinutes(dateNow, 60))
+      timeArray.push(this.addMinutes(dateNow, 90))
+    }
+    return timeArray
+  }
+
+  addMinutes(date, minutes) {
+    return new Date(date.getTime() + minutes * 60000);
   }
 }
 
